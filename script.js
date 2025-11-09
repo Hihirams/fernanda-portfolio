@@ -263,8 +263,14 @@ class ScrollController {
     }
     
     preventDefaultScroll() {
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
+        // Only prevent scroll on desktop, allow native scroll on mobile
+        if (window.innerWidth >= 768) {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+        }
     }
     
     handleWheel(e) {
