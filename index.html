@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fernanda Maldonado - Arquitectura</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Film Grain -->
+    <div class="grain"></div>
+
+    <!-- Apple-Style Navigation -->
+    <nav id="nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-content">
+                    <div class="logo-title">ARQ. FERNANDA MALDONADO</div>
+                    <div class="logo-subtitle">PORTAFOLIO DE PROYECTOS</div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <a href="#inicio" class="nav-link active" data-section="0">
+                    <span class="nav-text">Inicio</span>
+                </a>
+                <a href="#blueprint" class="nav-link" data-section="1">
+                    <span class="nav-text">Proceso</span>
+                </a>
+                <a href="#proyectos" class="nav-link" data-section="2">
+                    <span class="nav-text">Proyectos</span>
+                </a>
+                <a href="#filosofia" class="nav-link" data-section="3">
+                    <span class="nav-text">Filosofía</span>
+                </a>
+                <a href="#contacto" class="nav-link" data-section="4">
+                    <span class="nav-text">Contacto</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section con Partículas -->
+    <section id="inicio" class="section hero-section">
+        <div class="hero-background">
+            <div class="gradient-bg"></div>
+            <div class="glow-orb glow-orb-1"></div>
+            <div class="glow-orb glow-orb-2"></div>
+
+            <!-- PARTÍCULAS ABSTRACTAS -->
+            <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-title">
+                <h1>
+                    <div class="title-line title-line-1">
+                        <span class="letter">A</span>
+                        <span class="letter">R</span>
+                        <span class="letter">Q</span>
+                        <span class="letter">U</span>
+                        <span class="letter">I</span>
+                        <span class="letter">T</span>
+                        <span class="letter">E</span>
+                        <span class="letter">C</span>
+                        <span class="letter">T</span>
+                        <span class="letter">U</span>
+                        <span class="letter">R</span>
+                        <span class="letter">A</span>
+                    </div>
+                    <div class="title-line title-line-2">
+                        <span class="letter">Q</span>
+                        <span class="letter">U</span>
+                        <span class="letter">E</span>
+                    </div>
+                    <div class="title-line title-line-3">
+                        <span class="letter">I</span>
+                        <span class="letter">N</span>
+                        <span class="letter">S</span>
+                        <span class="letter">P</span>
+                        <span class="letter">I</span>
+                        <span class="letter">R</span>
+                        <span class="letter">A</span>
+                    </div>
+                </h1>
+
+                <div class="hero-location">
+                    <div class="location-line"></div>
+                    <div class="location-content">
+                        <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span>MONTERREY, N.L.</span>
+                    </div>
+                    <div class="location-line"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <span>SCROLL</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Blueprint Section -->
+    <section id="blueprint" class="section blueprint-section">
+        <div class="section-container">
+            <div class="blueprint-grid">
+                <div class="blueprint-text">
+                    <h2 class="section-title">
+                        <div class="title-word">CADA</div>
+                        <div class="title-word">LÍNEA</div>
+                        <div class="title-word">DEFINE</div>
+                    </h2>
+
+                    <p class="section-description">
+                        Del concepto inicial al detalle constructivo, cada trazo arquitectónico 
+                        define la experiencia espacial y emocional del proyecto.
+                    </p>
+
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <div class="stat-value">24+</div>
+                            <div class="stat-divider">
+                                <div class="stat-line"></div>
+                                <div class="stat-label">PROYECTOS REALIZADOS</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-divider">
+                                <div class="stat-line"></div>
+                                <div class="stat-label">AÑOS DE EXPERIENCIA</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">15</div>
+                            <div class="stat-divider">
+                                <div class="stat-line"></div>
+                                <div class="stat-label">RECONOCIMIENTOS</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="blueprint-status">Trazando fundamentos...</div>
+                </div>
+
+                <div class="blueprint-canvas">
+                    <svg viewBox="0 0 600 700" class="blueprint-svg">
+                        <defs>
+                            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.5"/>
+                            </pattern>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        
+                        <rect width="600" height="700" fill="url(#grid)" />
+
+                        <rect class="blueprint-line main-wall" x="100" y="100" width="400" height="500" 
+                              fill="none" stroke="#ffffff" stroke-width="3" filter="url(#glow)"
+                              stroke-dasharray="1800" stroke-dashoffset="1800"/>
+
+                        <g class="corner-marker" data-index="0">
+                            <circle cx="100" cy="100" r="5" fill="#ffffff"/>
+                            <circle cx="100" cy="100" r="8" fill="none" stroke="#ffffff" stroke-width="1" class="ripple-circle"/>
+                        </g>
+                        <g class="corner-marker" data-index="1">
+                            <circle cx="500" cy="100" r="5" fill="#ffffff"/>
+                            <circle cx="500" cy="100" r="8" fill="none" stroke="#ffffff" stroke-width="1" class="ripple-circle"/>
+                        </g>
+                        <g class="corner-marker" data-index="2">
+                            <circle cx="100" cy="600" r="5" fill="#ffffff"/>
+                            <circle cx="100" cy="600" r="8" fill="none" stroke="#ffffff" stroke-width="1" class="ripple-circle"/>
+                        </g>
+                        <g class="corner-marker" data-index="3">
+                            <circle cx="500" cy="600" r="5" fill="#ffffff"/>
+                            <circle cx="500" cy="600" r="8" fill="none" stroke="#ffffff" stroke-width="1" class="ripple-circle"/>
+                        </g>
+
+                        <line class="blueprint-line division-line" x1="300" y1="100" x2="300" y2="600" 
+                              stroke="#888" stroke-width="2" stroke-dasharray="500" stroke-dashoffset="500"/>
+                        <line class="blueprint-line division-line" x1="100" y1="300" x2="500" y2="300" 
+                              stroke="#888" stroke-width="2" stroke-dasharray="400" stroke-dashoffset="400"/>
+                        <line class="blueprint-line division-line" x1="100" y1="450" x2="500" y2="450" 
+                              stroke="#888" stroke-width="2" stroke-dasharray="400" stroke-dashoffset="400"/>
+
+                        <g class="blueprint-detail window-detail">
+                            <rect x="120" y="120" width="60" height="80" fill="none" stroke="#ffffff" stroke-width="1"/>
+                            <rect x="420" y="120" width="60" height="80" fill="none" stroke="#ffffff" stroke-width="1"/>
+                        </g>
+
+                        <g class="blueprint-detail door-detail">
+                            <line x1="280" y1="300" x2="320" y2="300" stroke="#ffffff" stroke-width="2" stroke-dasharray="40" stroke-dashoffset="40"/>
+                            <path d="M 280 300 Q 280 320 300 320" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="60" stroke-dashoffset="60"/>
+                        </g>
+
+                        <text class="room-label" x="200" y="200" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="300">SALA</text>
+                        <text class="room-label" x="400" y="200" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="300">COMEDOR</text>
+                        <text class="room-label" x="200" y="375" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="300">RECÁMARA</text>
+                        <text class="room-label" x="400" y="375" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="300">COCINA</text>
+                        <text class="room-label" x="300" y="525" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="300">BAÑO</text>
+
+                        <text x="300" y="50" fill="#ffffff" font-size="14" text-anchor="middle" letter-spacing="3" font-weight="300">PLANTA ARQUITECTÓNICA</text>
+
+                        <g class="blueprint-dimensions">
+                            <line x1="80" y1="100" x2="80" y2="600" stroke="#ffffff" stroke-width="1" stroke-dasharray="500" stroke-dashoffset="500"/>
+                            <text x="65" y="350" fill="#ffffff" font-size="12" transform="rotate(-90 65 350)">12.5m</text>
+                            <line x1="100" y1="630" x2="500" y2="630" stroke="#ffffff" stroke-width="1" stroke-dasharray="400" stroke-dashoffset="400"/>
+                            <text x="300" y="650" fill="#ffffff" font-size="12" text-anchor="middle">10.0m</text>
+                        </g>
+
+                        <text x="500" y="680" fill="#888" font-size="10" text-anchor="end" font-style="italic">Fernanda Maldonado</text>
+
+                        <g transform="translate(550, 50)">
+                            <circle cx="0" cy="0" r="20" fill="none" stroke="#333" stroke-width="2"/>
+                            <circle class="progress-circle" cx="0" cy="0" r="20" fill="none" stroke="#ffffff" stroke-width="2"
+                                    stroke-dasharray="126" stroke-dashoffset="126" transform="rotate(-90)"/>
+                            <text class="progress-text" x="0" y="5" fill="#ffffff" font-size="10" text-anchor="middle" font-weight="300">0%</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="proyectos" class="section projects-section">
+        <div class="section-container">
+            <div class="projects-header">
+                <h2 class="projects-title">
+                    <span class="projects-title-word">OBRA</span>
+                    <span class="projects-title-word secondary">DESTACADA</span>
+                </h2>
+                <p class="projects-subtitle">Proyectos que materializan nuestra visión arquitectónica</p>
+            </div>
+
+            <div class="projects-grid">
+                <div class="project-card" data-project="0">
+                    <div class="project-image-container">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=90" alt="Casa Serenidad" class="project-image">
+                        <div class="project-overlay"></div>
+                        <div class="project-grid-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-meta">San Pedro Garza García · 2024</div>
+                        <h3 class="project-title">CASA SERENIDAD</h3>
+                        <div class="project-link">
+                            <div class="project-link-line"></div>
+                            <span class="project-link-text">Ver más</span>
+                        </div>
+                    </div>
+                    <div class="project-number">01</div>
+                    <div class="project-corner project-corner-tl"></div>
+                    <div class="project-corner project-corner-br"></div>
+                </div>
+
+                <div class="project-card" data-project="1">
+                    <div class="project-image-container">
+                        <img src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1200&q=90" alt="Centro Nexus" class="project-image">
+                        <div class="project-overlay"></div>
+                        <div class="project-grid-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-meta">Monterrey Centro · 2023</div>
+                        <h3 class="project-title">CENTRO NEXUS</h3>
+                        <div class="project-link">
+                            <div class="project-link-line"></div>
+                            <span class="project-link-text">Ver más</span>
+                        </div>
+                    </div>
+                    <div class="project-number">02</div>
+                    <div class="project-corner project-corner-tl"></div>
+                    <div class="project-corner project-corner-br"></div>
+                </div>
+
+                <div class="project-card" data-project="2">
+                    <div class="project-image-container">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=90" alt="Torre Vertical" class="project-image">
+                        <div class="project-overlay"></div>
+                        <div class="project-grid-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-meta">Valle Oriente · 2024</div>
+                        <h3 class="project-title">TORRE VERTICAL</h3>
+                        <div class="project-link">
+                            <div class="project-link-line"></div>
+                            <span class="project-link-text">Ver más</span>
+                        </div>
+                    </div>
+                    <div class="project-number">03</div>
+                    <div class="project-corner project-corner-tl"></div>
+                    <div class="project-corner project-corner-br"></div>
+                </div>
+
+                <div class="project-card" data-project="3">
+                    <div class="project-image-container">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90" alt="Refugio Minimalista" class="project-image">
+                        <div class="project-overlay"></div>
+                        <div class="project-grid-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-meta">Santiago, N.L. · 2023</div>
+                        <h3 class="project-title">REFUGIO MINIMALISTA</h3>
+                        <div class="project-link">
+                            <div class="project-link-line"></div>
+                            <span class="project-link-text">Ver más</span>
+                        </div>
+                    </div>
+                    <div class="project-number">04</div>
+                    <div class="project-corner project-corner-tl"></div>
+                    <div class="project-corner project-corner-br"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section id="filosofia" class="section philosophy-section">
+        <div class="philosophy-shape"></div>
+        <div class="section-container">
+            <h2 class="philosophy-title">FILOSOFÍA</h2>
+            <blockquote class="philosophy-quote">
+                "La arquitectura debe hablar de su tiempo y lugar, pero anhelar la atemporalidad"
+            </blockquote>
+            <div class="philosophy-divider"></div>
+            <p class="philosophy-text">
+                Cada proyecto es una oportunidad para crear espacios que trascienden su función utilitaria. 
+                Diseñamos experiencias arquitectónicas que conectan con las emociones, respetan el entorno 
+                y perduran en la memoria colectiva.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="section contact-section">
+        <div class="contact-background">
+            <div class="contact-grid-pattern"></div>
+            <div class="contact-gradient-orb"></div>
+        </div>
+
+        <div class="section-container">
+            <div class="contact-header">
+                <h2 class="contact-title">
+                    <span class="letter">I</span>
+                    <span class="letter">N</span>
+                    <span class="letter">I</span>
+                    <span class="letter">C</span>
+                    <span class="letter">I</span>
+                    <span class="letter">E</span>
+                    <span class="letter">M</span>
+                    <span class="letter">O</span>
+                    <span class="letter">S</span>
+                </h2>
+                <p class="contact-subtitle">Tu proyecto merece arquitectura excepcional</p>
+            </div>
+
+            <div class="contact-main">
+                <div class="contact-form-section">
+                    <div class="contact-cta">
+                        <div class="cta-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <h3 class="cta-title">Diseñemos juntos</h3>
+                        <p class="cta-description">
+                            Agenda una consulta personalizada para discutir tu visión arquitectónica. 
+                            Transformaremos tus ideas en espacios extraordinarios.
+                        </p>
+                        <button class="cta-button">
+                            <span class="button-text">AGENDAR CONSULTA</span>
+                            <svg class="button-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="contact-info-section">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="info-label">EMAIL</div>
+                        <div class="info-value">hola@fernandamaldonado.com</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                        </div>
+                        <div class="info-label">TELÉFONO</div>
+                        <div class="info-value">+52 (81) XXXX-XXXX</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="info-label">UBICACIÓN</div>
+                        <div class="info-value">Monterrey, Nuevo León</div>
+                    </div>
+
+                    <div class="social-container">
+                        <div class="social-divider"></div>
+                        <div class="social-links">
+                            <a href="#" class="social-link" aria-label="LinkedIn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                                    <rect x="2" y="9" width="4" height="12"></rect>
+                                    <circle cx="4" cy="4" r="2"></circle>
+                                </svg>
+                            </a>
+                            <a href="#" class="social-link" aria-label="Instagram">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
