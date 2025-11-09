@@ -242,16 +242,22 @@ class ScrollController {
     init() {
         // Prevenir scroll nativo
         this.preventDefaultScroll();
-        
+
         // Manejar scroll con rueda
         window.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
-        
+
+        // Manejar touch events para móviles
+        this.touchStartY = 0;
+        window.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        window.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        window.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
         // Manejar teclado
         window.addEventListener('keydown', (e) => this.handleKeyboard(e));
-        
+
         // Navegación del menú
         this.setupNavigation();
-        
+
         // Inicializar primera sección
         this.showSection(0);
     }
@@ -418,7 +424,7 @@ class ScrollController {
     
     handleKeyboard(e) {
         if (this.isAnimating) return;
-        
+
         switch(e.key) {
             case 'ArrowDown':
             case 'PageDown':
@@ -435,6 +441,29 @@ class ScrollController {
                 e.preventDefault();
                 break;
         }
+    }
+
+    handleTouchStart(e) {
+        this.touchStartY = e.touches[0].clientY;
+    }
+
+    handleTouchMove(e) {
+        if (this.isAnimating) return;
+
+        e.preventDefault();
+        const touchCurrentY = e.touches[0].clientY;
+        const deltaY = this.touchStartY - touchCurrentY;
+
+        // Simular el evento wheel con deltaY
+        const simulatedEvent = { deltaY: deltaY * 2 }; // Multiplicar para mayor sensibilidad
+        this.handleWheel(simulatedEvent);
+
+        this.touchStartY = touchCurrentY;
+    }
+
+    handleTouchEnd(e) {
+        // Reset touch start position
+        this.touchStartY = 0;
     }
     
     scrollToSection(index) {
