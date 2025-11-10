@@ -700,10 +700,11 @@ initCustomScrollbar() {
         }
     }
 
-    handleTouchStart(e) {
-        // DESHABILITAR touch scroll en mobile
+handleTouchStart(e) {
         if (window.innerWidth < 769) {
-            // No hacer nada - el touch no debe funcionar para scroll
+            // Mobile: inicializar touch para control de animaciones
+            this.touchStartY = e.touches[0].clientY;
+            this.lastTouchY = e.touches[0].clientY;
             return;
         }
         // Desktop/tablet: mantener funcionalidad original
@@ -711,12 +712,68 @@ initCustomScrollbar() {
     }
 
     handleTouchMove(e) {
-        // DESHABILITAR touch scroll en mobile
         if (window.innerWidth < 769) {
-            // Prevenir el scroll nativo pero no simular wheel
-            e.preventDefault();
+            // Mobile: controlar animaciones con touch directo
+            if (this.isAnimating) return;
+
+            const currentY = e.touches[0].clientY;
+            const deltaY = this.lastTouchY - currentY; // positivo = abajo
+            this.lastTouchY = currentY;
+
+            const currentSectionElement = this.sections[this.currentSection];
+            const sectionId = currentSectionElement ? currentSectionElement.id : null;
+
+            // Aplicar el mismo control que el scroll bar
+            if (sectionId === 'blueprint' || sectionId === 'proyectos' ||
+                sectionId === 'filosofia' || sectionId === 'contacto') {
+
+                let scrollSpeed = 0.008; // Más rápido para touch directo
+                if (sectionId === 'blueprint') scrollSpeed = 0.01;
+                if (sectionId === 'proyectos') scrollSpeed = 0.009;
+                if (sectionId === 'filosofia') scrollSpeed = 0.012;
+                if (sectionId === 'contacto') scrollSpeed = 0.012;
+
+                this.animationProgress += deltaY * scrollSpeed;
+                this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
+
+                if (sectionId === 'blueprint') {
+                    this.updateBlueprint(this.animationProgress);
+                } else if (sectionId === 'proyectos') {
+                    this.updateProjects(this.animationProgress);
+                } else if (sectionId === 'filosofia') {
+                    this.updatePhilosophy(this.animationProgress);
+                } else if (sectionId === 'contacto') {
+                    this.updateContact(this.animationProgress);
+                }
+
+                if (this.animationProgress >= 0.99 && deltaY > 0) {
+                    if (this.currentSection < this.sections.length - 1) {
+                        this.scrollToNextSection();
+                    }
+                }
+
+                if (this.animationProgress <= 0.01 && deltaY < 0) {
+                    if (this.currentSection > 0) {
+                        this.scrollToPrevSection();
+                    }
+                }
+
+                e.preventDefault();
+            } else {
+                // Sección Inicio: acumular para cambio
+                if (!this.touchAccumulator) this.touchAccumulator = 0;
+                this.touchAccumulator += deltaY;
+
+                if (Math.abs(this.touchAccumulator) > 100) {
+                    if (this.touchAccumulator > 0 && this.currentSection < this.sections.length - 1) {
+                        this.scrollToNextSection();
+                    }
+                    this.touchAccumulator = 0;
+                }
+            }
             return;
         }
+
         // Desktop/tablet: mantener funcionalidad original
         if (this.isAnimating) return;
 
@@ -731,8 +788,9 @@ initCustomScrollbar() {
     }
 
     handleTouchEnd(e) {
-        // DESHABILITAR touch scroll en mobile
         if (window.innerWidth < 769) {
+            // Mobile: limpiar acumulador
+            this.touchAccumulator = 0;
             return;
         }
         // Desktop/tablet: mantener funcionalidad original
