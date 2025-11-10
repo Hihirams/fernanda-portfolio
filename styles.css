@@ -354,6 +354,18 @@ body {
     color: var(--accent-dim);
 }
 
+/* Ocultar scroll indicator en desktop */
+.scroll-indicator {
+    display: none;
+}
+
+/* Solo mostrar en mobile */
+@media (max-width: 768px) {
+    .scroll-indicator {
+        display: flex;
+    }
+}
+
 .scroll-indicator {
     position: absolute;
     bottom: 3rem;
@@ -1131,10 +1143,10 @@ body {
 @media (max-width: 768px) {
     :root {
         --hero-title-size: 2.5rem;
-        --projects-padding-top: 1rem;
-        --projects-padding-bottom: 1rem;
+        --projects-padding-top: 2rem;
+        --projects-padding-bottom: 2rem;
         --projects-header-margin: 1.5rem;
-        --projects-grid-height: 45vh;
+        --projects-grid-height: 70vh;
         --contact-padding-top: 3rem;
         --contact-padding-bottom: 6rem;
         --contact-header-margin: 2rem;
@@ -1164,9 +1176,20 @@ body {
         font-size: 2.5rem;
     }
 
+    .projects-section .section-container {
+        min-height: auto;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
     .projects-grid {
         max-width: 100%;
         padding: 0 1rem;
+        height: 70vh;
+    }
+
+    .project-card {
+        top: 50%; /* Centrar verticalmente */
     }
 
     .project-title {
@@ -1219,11 +1242,11 @@ body {
         display: flex;
         flex-direction: column;
         align-items: center;
-        position: fixed;
+        position: absolute;
         bottom: 2rem;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1000;
+        z-index: 100;
         opacity: 0.7;
         animation: mobileScrollPulse 3s ease-in-out infinite;
     }
@@ -1242,11 +1265,43 @@ body {
         background: linear-gradient(to bottom, var(--accent-dimmer), transparent);
         animation: mobileScrollLineMove 2s ease-in-out infinite;
     }
+
+    .hero-section {
+        min-height: 100vh;
+        height: 100vh; /* Forzar altura completa */
+    }
+
+    .hero-background {
+        height: 100vh;
+    }
+
+    .blueprint-section {
+        padding: 4rem 0;
+        min-height: auto; /* Quitar altura mínima */
+    }
+
+    .blueprint-grid {
+        gap: 2rem;
+    }
+
+    .blueprint-canvas {
+        height: 400px; /* Reducir altura */
+        margin-top: 2rem;
+    }
+
+    /* Asegurar que el texto y canvas sean visibles */
+    .blueprint-text {
+        margin-bottom: 1rem;
+    }
 }
 
 @keyframes mobileScrollPulse {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 0.8; }
+}
+
+.mobile-scroll-indicator {
+    display: none; /* Oculto por defecto en desktop */
 }
 
 @keyframes mobileScrollLineMove {

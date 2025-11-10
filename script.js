@@ -301,43 +301,42 @@ class ScrollController {
     }
 
     handleNativeScroll() {
-    // Detectar en qué sección estamos basándonos en la posición del scroll
-    const scrollPosition = window.scrollY;
-    const windowHeight = window.innerHeight;
-    
-    this.sections.forEach((section, index) => {
-        const rect = section.getBoundingClientRect();
-        const sectionTop = rect.top + scrollPosition;
-        const sectionHeight = rect.height;
-        
-        // Si la sección está visible
-        if (scrollPosition >= sectionTop - windowHeight / 2 && 
-            scrollPosition < sectionTop + sectionHeight - windowHeight / 2) {
-            
-            // Actualizar sección actual
-            if (this.currentSection !== index) {
-                this.currentSection = index;
-                this.updateActiveNav(index);
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+
+        this.sections.forEach((section, index) => {
+            const rect = section.getBoundingClientRect();
+            const sectionTop = rect.top + scrollPosition;
+            const sectionHeight = rect.height;
+
+            // Detectar si la sección está visible (más tolerante)
+            if (rect.top < windowHeight * 0.6 && rect.bottom > windowHeight * 0.4) {
+
+                if (this.currentSection !== index) {
+                    this.currentSection = index;
+                    this.updateActiveNav(index);
+                }
+
+                // Calcular progreso basado en visibilidad
+                const visibleTop = Math.max(0, -rect.top);
+                const visibleHeight = Math.min(rect.height, windowHeight);
+                this.animationProgress = visibleTop / (rect.height - windowHeight * 0.5);
+                this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
+
+                // Actualizar animaciones
+                const sectionId = section.id;
+                if (sectionId === 'blueprint') {
+                    this.updateBlueprint(this.animationProgress);
+                } else if (sectionId === 'proyectos') {
+                    this.updateProjects(this.animationProgress);
+                } else if (sectionId === 'filosofia') {
+                    this.updatePhilosophy(this.animationProgress);
+                } else if (sectionId === 'contacto') {
+                    this.updateContact(this.animationProgress);
+                }
             }
-            
-            // Calcular progreso dentro de la sección
-            const sectionScrollProgress = (scrollPosition - sectionTop) / (sectionHeight - windowHeight);
-            this.animationProgress = Math.max(0, Math.min(1, sectionScrollProgress));
-            
-            // Actualizar animaciones según la sección
-            const sectionId = section.id;
-            if (sectionId === 'blueprint') {
-                this.updateBlueprint(this.animationProgress);
-            } else if (sectionId === 'proyectos') {
-                this.updateProjects(this.animationProgress);
-            } else if (sectionId === 'filosofia') {
-                this.updatePhilosophy(this.animationProgress);
-            } else if (sectionId === 'contacto') {
-                this.updateContact(this.animationProgress);
-            }
-        }
-    });
-}
+        });
+    }
 
     
     handleBlueprintScroll(delta) {
@@ -680,7 +679,9 @@ class ScrollController {
         const projectCards = section.querySelectorAll('.project-card');
         const totalProjects = projectCards.length;
 
-        // Usar requestAnimationFrame para animaciones más suaves
+        // Detectar si estamos en mobile
+        const isMobile = window.innerWidth < 769;
+
         requestAnimationFrame(() => {
             projectCards.forEach((card, index) => {
                 const startProgress = index / totalProjects;
@@ -689,45 +690,61 @@ class ScrollController {
                 const isActive = progress >= startProgress && progress < endProgress;
                 const projectProgress = Math.max(0, Math.min(1, (progress - startProgress) / (endProgress - startProgress)));
 
-                // Aplicar easing para transiciones más suaves
-                const easeInOut = t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-                const easedProgress = easeInOut(projectProgress);
-
-                if (isActive) {
-                    // Animación de entrada más suave
-                    const scale = 0.85 + (Math.min(easedProgress, 0.4) / 0.4) * 0.15;
-                    const translateX = (1 - Math.min(easedProgress, 0.4) / 0.4) * -100;
-                    const opacity = Math.min(easedProgress / 0.4, 1);
-
-                    // Usar will-change para optimizar rendimiento
-                    card.style.willChange = 'transform, opacity';
-                    card.style.transform = `translateX(${translateX}%) scale(${scale})`;
-                    card.style.opacity = opacity;
-                    card.style.zIndex = 100;
-                    card.classList.add('active');
-                } else if (progress < startProgress) {
-                    // Estado de pila (antes del proyecto activo)
-                    const stackIndex = index;
-                    const stackOffset = stackIndex * 4; // Aumentar separación para evitar solapamiento
-                    const stackRotate = (stackIndex % 2 === 0 ? 1 : -1) * 3; // Aumentar rotación
-
-                    card.style.willChange = 'transform, opacity';
-                    card.style.transform = `translateX(-50%) translateY(${stackOffset}px) rotate(${stackRotate}deg) scale(0.75)`;
-                    card.style.opacity = '0.7';
-                    card.style.zIndex = index;
-                    card.classList.remove('active');
+                if (isMobile) {
+                    // Animación simplificada para mobile
+                    if (isActive) {
+                        card.style.transform = 'translateX(0) scale(1)';
+                        card.style.opacity = '1';
+                        card.style.zIndex = '100';
+                        card.classList.add('active');
+                    } else if (progress < startProgress) {
+                        card.style.transform = 'translateX(-100%) scale(0.85)';
+                        card.style.opacity = '0.5';
+                        card.style.zIndex = index.toString();
+                        card.classList.remove('active');
+                    } else {
+                        card.style.transform = 'translateX(100%) scale(0.85)';
+                        card.style.opacity = '0';
+                        card.style.zIndex = '1';
+                        card.classList.remove('active');
+                    }
                 } else {
-                    // Animación de salida más suave
-                    const exitProgress = Math.max(0, Math.min(1, (progress - endProgress) / (1 - endProgress)));
-                    const easedExit = easeInOut(exitProgress);
-                    const translateX = 100 + (easedExit * 60); // Aumentar distancia de salida
-                    const opacity = Math.max(0, 1 - easedExit * 1.5);
+                    // Animación original para desktop
+                    const easeInOut = t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+                    const easedProgress = easeInOut(projectProgress);
 
-                    card.style.willChange = 'transform, opacity';
-                    card.style.transform = `translateX(${translateX}%) scale(0.85)`;
-                    card.style.opacity = opacity;
-                    card.style.zIndex = 1;
-                    card.classList.remove('active');
+                    if (isActive) {
+                        const scale = 0.85 + (Math.min(easedProgress, 0.4) / 0.4) * 0.15;
+                        const translateX = (1 - Math.min(easedProgress, 0.4) / 0.4) * -100;
+                        const opacity = Math.min(easedProgress / 0.4, 1);
+
+                        card.style.willChange = 'transform, opacity';
+                        card.style.transform = `translateX(${translateX}%) scale(${scale})`;
+                        card.style.opacity = opacity;
+                        card.style.zIndex = '100';
+                        card.classList.add('active');
+                    } else if (progress < startProgress) {
+                        const stackIndex = index;
+                        const stackOffset = stackIndex * 4;
+                        const stackRotate = (stackIndex % 2 === 0 ? 1 : -1) * 3;
+
+                        card.style.willChange = 'transform, opacity';
+                        card.style.transform = `translateX(-50%) translateY(${stackOffset}px) rotate(${stackRotate}deg) scale(0.75)`;
+                        card.style.opacity = '0.7';
+                        card.style.zIndex = index.toString();
+                        card.classList.remove('active');
+                    } else {
+                        const exitProgress = Math.max(0, Math.min(1, (progress - endProgress) / (1 - endProgress)));
+                        const easedExit = easeInOut(exitProgress);
+                        const translateX = 100 + (easedExit * 60);
+                        const opacity = Math.max(0, 1 - easedExit * 1.5);
+
+                        card.style.willChange = 'transform, opacity';
+                        card.style.transform = `translateX(${translateX}%) scale(0.85)`;
+                        card.style.opacity = opacity;
+                        card.style.zIndex = '1';
+                        card.classList.remove('active');
+                    }
                 }
             });
         });
