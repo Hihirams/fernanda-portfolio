@@ -281,47 +281,45 @@ initCustomScrollbar() {
 
     let isDragging = false;
     let startY = 0;
-    let startThumbTop = 0;
+    let lastY = 0;
+    let accumulatedDelta = 0;
 
-    const trackHeight = 240; // Altura del track
-    const trackPadding = 4; // Padding del track
+    const trackHeight = 240;
+    const trackPadding = 4;
     const usableTrackHeight = trackHeight - (trackPadding * 2);
 
-    // Calcular altura del thumb basado en proporción de contenido
-    const calculateThumbHeight = () => {
-        const viewportHeight = window.innerHeight;
-        const contentHeight = document.documentElement.scrollHeight;
-        const thumbRatio = Math.max(0.2, viewportHeight / contentHeight);
-        return Math.max(50, usableTrackHeight * thumbRatio);
-    };
-
-    // Actualizar posición del thumb basado en scroll
-    const updateThumb = () => {
-        const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-        const thumbHeight = calculateThumbHeight();
+    // Calcular posición visual del thumb basado en sección y progreso de animación
+    const updateThumbVisual = () => {
+        const totalSections = this.sections.length;
+        const sectionProgress = (this.currentSection + this.animationProgress) / totalSections;
+        
+        const thumbHeight = Math.max(50, usableTrackHeight / totalSections);
         const maxThumbTop = usableTrackHeight - thumbHeight;
-
+        
         thumb.style.height = `${thumbHeight}px`;
-        thumb.style.top = `${trackPadding + (scrollPercentage * maxThumbTop)}px`;
+        thumb.style.top = `${trackPadding + (sectionProgress * maxThumbTop)}px`;
     };
 
-    // Iniciar arrastre - MEJORADO para touch
+    // Iniciar arrastre
     const startDrag = (e) => {
+        if (this.isAnimating) return;
+        
         isDragging = true;
         thumb.classList.add('dragging');
         
         const touch = e.touches ? e.touches[0] : e;
         startY = touch.clientY;
-        startThumbTop = parseFloat(thumb.style.top) || trackPadding;
+        lastY = touch.clientY;
+        accumulatedDelta = 0;
 
         document.body.style.userSelect = 'none';
-        document.body.style.touchAction = 'none'; // CRÍTICO: Prevenir scroll nativo
+        document.body.style.touchAction = 'none';
 
         e.preventDefault();
         e.stopPropagation();
     };
 
-    // Mover durante arrastre - OPTIMIZADO
+    // Mover durante arrastre - CON CONTROL DE ANIMACIONES POR SECCIÓN
     const onDrag = (e) => {
         if (!isDragging) return;
 
@@ -329,22 +327,93 @@ initCustomScrollbar() {
         e.stopPropagation();
 
         const touch = e.touches ? e.touches[0] : e;
-        const deltaY = touch.clientY - startY;
-        
-        const thumbHeight = parseFloat(thumb.style.height) || 50;
-        const maxThumbTop = usableTrackHeight - thumbHeight;
-        
-        // Nueva posición del thumb
-        let newThumbTop = startThumbTop + deltaY;
-        newThumbTop = Math.max(trackPadding, Math.min(trackPadding + maxThumbTop, newThumbTop));
-        
-        // Calcular scroll correspondiente
-        const thumbProgress = (newThumbTop - trackPadding) / maxThumbTop;
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        
-        // Actualizar scroll y thumb simultáneamente
-        window.scrollTo(0, thumbProgress * maxScroll);
-        thumb.style.top = `${newThumbTop}px`;
+        const currentY = touch.clientY;
+        const deltaY = lastY - currentY; // Invertido: positivo = scroll down
+        lastY = currentY;
+
+        // Obtener sección actual e ID
+        const currentSectionElement = this.sections[this.currentSection];
+        const sectionId = currentSectionElement ? currentSectionElement.id : null;
+
+        // SECCIONES CON ANIMACIONES (Blueprint, Proyectos, Filosofía, Contacto)
+        if (sectionId === 'blueprint' || sectionId === 'proyectos' ||
+            sectionId === 'filosofia' || sectionId === 'contacto') {
+
+            // Velocidad de scroll según sección
+            let scrollSpeed = 0.003;
+            if (sectionId === 'blueprint') scrollSpeed = 0.004;
+            if (sectionId === 'proyectos') scrollSpeed = 0.0035;
+            if (sectionId === 'filosofia') scrollSpeed = 0.006;
+            if (sectionId === 'contacto') scrollSpeed = 0.006;
+
+            // Actualizar progreso de animación
+            this.animationProgress += deltaY * scrollSpeed;
+            this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
+
+            // Actualizar animaciones de la sección actual
+            if (sectionId === 'blueprint') {
+                this.updateBlueprint(this.animationProgress);
+            } else if (sectionId === 'proyectos') {
+                this.updateProjects(this.animationProgress);
+            } else if (sectionId === 'filosofia') {
+                this.updatePhilosophy(this.animationProgress);
+            } else if (sectionId === 'contacto') {
+                this.updateContact(this.animationProgress);
+            }
+
+            // Si la animación se completó (99%), permitir avanzar a siguiente sección
+            if (this.animationProgress >= 0.99 && deltaY > 0) {
+                if (this.currentSection < this.sections.length - 1) {
+                    // Transición a siguiente sección
+                    this.scrollToNextSection();
+                    isDragging = false;
+                    thumb.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    document.body.style.touchAction = '';
+                }
+            }
+
+            // Si volvemos al inicio (1%), ir a sección anterior
+            if (this.animationProgress <= 0.01 && deltaY < 0) {
+                if (this.currentSection > 0) {
+                    this.scrollToPrevSection();
+                    isDragging = false;
+                    thumb.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    document.body.style.touchAction = '';
+                }
+            }
+
+            // Actualizar posición visual del thumb
+            updateThumbVisual();
+
+        } else {
+            // SECCIÓN SIN ANIMACIONES (Inicio) - acumular delta para cambio de sección
+            accumulatedDelta += deltaY;
+
+            if (Math.abs(accumulatedDelta) > 50) {
+                if (accumulatedDelta > 0 && this.currentSection < this.sections.length - 1) {
+                    // Scroll hacia abajo - ir a siguiente sección
+                    this.scrollToNextSection();
+                    accumulatedDelta = 0;
+                    isDragging = false;
+                    thumb.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    document.body.style.touchAction = '';
+                } else if (accumulatedDelta < 0 && this.currentSection > 0) {
+                    // Scroll hacia arriba - ir a sección anterior
+                    this.scrollToPrevSection();
+                    accumulatedDelta = 0;
+                    isDragging = false;
+                    thumb.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    document.body.style.touchAction = '';
+                }
+            }
+
+            // Actualizar thumb visual
+            updateThumbVisual();
+        }
     };
 
     // Terminar arrastre
@@ -355,32 +424,33 @@ initCustomScrollbar() {
         thumb.classList.remove('dragging');
         document.body.style.userSelect = '';
         document.body.style.touchAction = '';
+        accumulatedDelta = 0;
     };
 
-    // Click directo en el track
+    // Click directo en el track - saltar a sección
     const clickTrack = (e) => {
         if (e.target === track || e.target.classList.contains('custom-scroll-track')) {
             const rect = track.getBoundingClientRect();
             const clickY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-            const percentage = Math.max(0, Math.min(1, clickY / trackHeight));
+            const percentage = Math.max(0, Math.min(1, (clickY - trackPadding) / usableTrackHeight));
 
-            const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-            window.scrollTo({
-                top: percentage * scrollableHeight,
-                behavior: 'smooth'
-            });
+            // Calcular sección objetivo
+            const targetSection = Math.floor(percentage * this.sections.length);
+            const clampedSection = Math.max(0, Math.min(this.sections.length - 1, targetSection));
+
+            if (clampedSection !== this.currentSection) {
+                this.scrollToSection(clampedSection);
+            }
         }
     };
 
-    // Event listeners - MEJORADOS
-    // Usar el área táctil expandida para iniciar drag
+    // Event listeners
     if (touchArea) {
         touchArea.addEventListener('touchstart', startDrag, { passive: false });
     }
     thumb.addEventListener('touchstart', startDrag, { passive: false });
     thumb.addEventListener('mousedown', startDrag);
 
-    // Listeners globales para drag
     document.addEventListener('touchmove', onDrag, { passive: false });
     document.addEventListener('mousemove', onDrag);
 
@@ -388,18 +458,18 @@ initCustomScrollbar() {
     document.addEventListener('touchcancel', endDrag);
     document.addEventListener('mouseup', endDrag);
 
-    // Click en track
     track.addEventListener('touchstart', clickTrack, { passive: false });
     track.addEventListener('click', clickTrack);
 
-    // Actualizar en scroll
-    window.addEventListener('scroll', updateThumb, { passive: true });
+    // Actualizar thumb cuando cambia sección o animación
+    setInterval(() => {
+        if (!isDragging) {
+            updateThumbVisual();
+        }
+    }, 100);
     
     // Inicializar
-    updateThumb();
-    
-    // Actualizar en resize
-    window.addEventListener('resize', updateThumb, { passive: true });
+    updateThumbVisual();
 }
 
     
