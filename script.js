@@ -263,8 +263,31 @@ class ScrollController {
     // Navegación del menú
     this.setupNavigation();
 
+    // Actualizar scroll thumb en mobile
+    if (window.innerWidth < 769) {
+        this.initCustomScrollbar();
+    }
+
     // Inicializar primera sección
     this.showSection(0);
+}
+
+initCustomScrollbar() {
+    const thumb = document.querySelector('.custom-scroll-thumb');
+    if (!thumb) return;
+
+    const updateThumb = () => {
+        const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+        const trackHeight = 120; // Altura del track
+        const thumbHeight = Math.max(20, trackHeight * 0.3); // Mínimo 20px
+        const maxThumbTop = trackHeight - thumbHeight;
+
+        thumb.style.height = `${thumbHeight}px`;
+        thumb.style.top = `${scrollPercentage * maxThumbTop}px`;
+    };
+
+    window.addEventListener('scroll', updateThumb, { passive: true });
+    updateThumb();
 }
 
     
@@ -791,45 +814,59 @@ class ScrollController {
     updateContact(progress) {
         const section = document.getElementById('contacto');
         if (!section) return;
-        
+
+        // Detectar mobile
+        const isMobile = window.innerWidth < 769;
+        const speedMultiplier = isMobile ? 1.5 : 1; // Más rápido en mobile
+
         const gridPattern = section.querySelector('.contact-grid-pattern');
         if (gridPattern) {
-            gridPattern.style.opacity = Math.min(progress * 2, 1);
+            gridPattern.style.opacity = Math.min(progress * 2 * speedMultiplier, 1);
         }
-        
+
         const gradientOrb = section.querySelector('.contact-gradient-orb');
         if (gradientOrb) {
-            gradientOrb.style.opacity = Math.min(progress * 1.5, 1);
+            gradientOrb.style.opacity = Math.min(progress * 1.5 * speedMultiplier, 1);
         }
-        
+
         const titleLetters = section.querySelectorAll('.contact-title .letter');
         titleLetters.forEach((letter, index) => {
-            if (progress > 0.1) {
-                const letterProgress = Math.min(1, (progress - 0.1) * 2);
+            const threshold = isMobile ? 0.05 : 0.1;
+            if (progress > threshold) {
+                const letterProgress = Math.min(1, (progress - threshold) * 2 * speedMultiplier);
                 letter.style.opacity = letterProgress;
                 letter.style.transform = `translate(0, 0)`;
             }
         });
-        
+
         const subtitle = section.querySelector('.contact-subtitle');
-        if (subtitle && progress > 0.3) {
-            const subtitleProgress = (progress - 0.3) / 0.7;
-            subtitle.style.opacity = subtitleProgress;
-            subtitle.style.transform = `translateY(${(1 - subtitleProgress) * 40}px)`;
+        if (subtitle) {
+            const threshold = isMobile ? 0.15 : 0.3;
+            if (progress > threshold) {
+                const subtitleProgress = (progress - threshold) / (1 - threshold) * speedMultiplier;
+                subtitle.style.opacity = Math.min(subtitleProgress, 1);
+                subtitle.style.transform = `translateY(${(1 - Math.min(subtitleProgress, 1)) * 40}px)`;
+            }
         }
-        
+
         const formSection = section.querySelector('.contact-form-section');
-        if (formSection && progress > 0.4) {
-            const formProgress = (progress - 0.4) / 0.6;
-            formSection.style.opacity = formProgress;
-            formSection.style.transform = `translateY(${(1 - formProgress) * 50}px)`;
+        if (formSection) {
+            const threshold = isMobile ? 0.2 : 0.4;
+            if (progress > threshold) {
+                const formProgress = (progress - threshold) / (1 - threshold) * speedMultiplier;
+                formSection.style.opacity = Math.min(formProgress, 1);
+                formSection.style.transform = `translateY(${(1 - Math.min(formProgress, 1)) * 50}px)`;
+            }
         }
-        
+
         const infoSection = section.querySelector('.contact-info-section');
-        if (infoSection && progress > 0.5) {
-            const infoProgress = (progress - 0.5) / 0.5;
-            infoSection.style.opacity = infoProgress;
-            infoSection.style.transform = `translateY(${(1 - infoProgress) * 50}px)`;
+        if (infoSection) {
+            const threshold = isMobile ? 0.25 : 0.5;
+            if (progress > threshold) {
+                const infoProgress = (progress - threshold) / (1 - threshold) * speedMultiplier;
+                infoSection.style.opacity = Math.min(infoProgress, 1);
+                infoSection.style.transform = `translateY(${(1 - Math.min(infoProgress, 1)) * 50}px)`;
+            }
         }
     }
     

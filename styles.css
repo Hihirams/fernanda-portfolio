@@ -1233,9 +1233,29 @@ body {
         font-size: 1.5rem;
     }
 
+    /* Hacer que el canvas cubra toda la pantalla */
     .particles-canvas {
-        height: 50%;
-        opacity: 0.4;
+        width: 100%;
+        height: 100vh;
+        opacity: 0.8;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+
+    /* Ajustar orbs para que cubran toda la pantalla */
+    .glow-orb-1 {
+        width: 100vw;
+        height: 100vh;
+        top: -20%;
+        right: -30%;
+    }
+
+    .glow-orb-2 {
+        width: 100vw;
+        height: 100vh;
+        bottom: -20%;
+        left: -30%;
     }
 
     .mobile-scroll-indicator {
@@ -1293,6 +1313,169 @@ body {
     .blueprint-text {
         margin-bottom: 1rem;
     }
+
+    /* Ajustar Blueprint para mobile - Planta al lado del título */
+    .blueprint-section {
+        padding: 3rem 0;
+        min-height: 100vh;
+    }
+
+    .blueprint-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blueprint-text {
+        order: 1;
+    }
+
+    .blueprint-canvas {
+        order: 2;
+        height: 300px;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    /* Layout lado a lado para título y planta */
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .stats-container {
+        margin-top: 1.5rem;
+    }
+
+    .stat-item {
+        gap: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        min-width: 70px;
+    }
+
+    /* Subir imágenes de proyectos en mobile */
+    .projects-section {
+        padding: 3rem 0;
+    }
+
+    .projects-section .section-container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .projects-grid {
+        height: 75vh;
+        margin-top: 2rem;
+    }
+
+    .project-card {
+        top: 45%; /* Subir las tarjetas */
+    }
+
+    .project-content {
+        padding: 1.5rem;
+    }
+
+    .project-title {
+        font-size: 1.5rem;
+    }
+
+    .project-number {
+        font-size: 4rem;
+        top: 1rem;
+        right: 1rem;
+    }
+
+    /* Compactar sección Iniciemos (Contacto) */
+    .contact-section {
+        padding: 3rem 0;
+        min-height: 100vh;
+    }
+
+    .contact-header {
+        margin-bottom: 2rem;
+    }
+
+    .contact-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .contact-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .contact-main {
+        gap: 2rem;
+    }
+
+    /* Hacer tarjeta más compacta */
+    .contact-cta {
+        padding: 1.5rem;
+    }
+
+    .cta-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 1rem;
+    }
+
+    .cta-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .cta-description {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-button {
+        padding: 0.9rem 1.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Compactar info cards */
+    .info-card {
+        padding: 1rem 0;
+    }
+
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-label {
+        font-size: 0.6rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+    }
+
+    /* Social más compacto */
+    .social-container {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+    }
+
+    .social-links {
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .social-link {
+        width: 38px;
+        height: 38px;
+    }
 }
 
 @keyframes mobileScrollPulse {
@@ -1319,30 +1502,22 @@ body {
    SCROLLBAR PERSONALIZADO - MÓVIL/DESKTOP
    ========================================== */
 
-/* Scrollbar visible solo en móviles */
+/* Ocultar scrollbar nativo en mobile */
 @media (max-width: 768px) {
     html, body {
         overflow-x: hidden;
-        overflow-y: auto !important;
+        overflow-y: auto;
         scroll-behavior: smooth;
     }
     
-    /* Scrollbar personalizada para móviles */
+    /* Ocultar scrollbar pero mantener funcionalidad */
+    body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
     body::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    body::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-    }
-    
-    body::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 4px;
-    }
-    
-    body::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
+        display: none;
     }
 }
 
@@ -1355,5 +1530,68 @@ body {
     body {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+}
+
+/* ==========================================
+   CUSTOM SCROLLBAR PARA MOBILE - APPLE STYLE
+   ========================================== */
+@media (max-width: 768px) {
+    /* Barra de scroll personalizada */
+    body::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    
+    body::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Indicador de scroll fijo */
+    .custom-scroll-indicator {
+        position: fixed;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .custom-scroll-indicator span {
+        writing-mode: vertical-rl;
+        font-size: 0.65rem;
+        letter-spacing: 0.2em;
+        color: var(--accent-dimmer);
+        text-transform: uppercase;
+    }
+
+    .custom-scroll-track {
+        width: 2px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.1);
+        position: relative;
+        border-radius: 2px;
+    }
+
+    .custom-scroll-thumb {
+        width: 2px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 2px;
+        position: absolute;
+        top: 0;
+        transition: height 0.3s ease;
     }
 }
