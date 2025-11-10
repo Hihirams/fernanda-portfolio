@@ -240,34 +240,41 @@ class ScrollController {
     }
     
     init() {
-        // Prevenir scroll nativo
-        this.preventDefaultScroll();
+    // Prevenir scroll nativo
+    this.preventDefaultScroll();
 
-        // Manejar scroll con rueda
-        window.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
+    // Manejar scroll con rueda (desktop)
+    window.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
 
-        // Manejar touch events para móviles
-        this.touchStartY = 0;
-        window.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
-        window.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
-        window.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
-
-        // Manejar teclado
-        window.addEventListener('keydown', (e) => this.handleKeyboard(e));
-
-        // Navegación del menú
-        this.setupNavigation();
-
-        // Inicializar primera sección
-        this.showSection(0);
+    // ✨ NUEVO: Manejar scroll nativo (móviles)
+    if (window.innerWidth < 769) {
+        window.addEventListener('scroll', () => this.handleNativeScroll(), { passive: true });
     }
+
+    // Manejar touch events para móviles
+    this.touchStartY = 0;
+    window.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+    window.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+    window.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
+    // Manejar teclado
+    window.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+    // Navegación del menú
+    this.setupNavigation();
+
+    // Inicializar primera sección
+    this.showSection(0);
+}
+
     
     preventDefaultScroll() {
-        // Only prevent scroll on desktop, allow native scroll on mobile
-        if (window.innerWidth >= 768) {
+        // Solo prevenir scroll en desktop, permitir scroll nativo en móvil
+        if (window.innerWidth >= 769) {
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
         } else {
+            // En móviles, permitir scroll nativo
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
         }
@@ -292,6 +299,46 @@ class ScrollController {
             this.handleSimpleScroll(delta);
         }
     }
+
+    handleNativeScroll() {
+    // Detectar en qué sección estamos basándonos en la posición del scroll
+    const scrollPosition = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    this.sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top + scrollPosition;
+        const sectionHeight = rect.height;
+        
+        // Si la sección está visible
+        if (scrollPosition >= sectionTop - windowHeight / 2 && 
+            scrollPosition < sectionTop + sectionHeight - windowHeight / 2) {
+            
+            // Actualizar sección actual
+            if (this.currentSection !== index) {
+                this.currentSection = index;
+                this.updateActiveNav(index);
+            }
+            
+            // Calcular progreso dentro de la sección
+            const sectionScrollProgress = (scrollPosition - sectionTop) / (sectionHeight - windowHeight);
+            this.animationProgress = Math.max(0, Math.min(1, sectionScrollProgress));
+            
+            // Actualizar animaciones según la sección
+            const sectionId = section.id;
+            if (sectionId === 'blueprint') {
+                this.updateBlueprint(this.animationProgress);
+            } else if (sectionId === 'proyectos') {
+                this.updateProjects(this.animationProgress);
+            } else if (sectionId === 'filosofia') {
+                this.updatePhilosophy(this.animationProgress);
+            } else if (sectionId === 'contacto') {
+                this.updateContact(this.animationProgress);
+            }
+        }
+    });
+}
+
     
     handleBlueprintScroll(delta) {
         if (this.isAnimating) return;
@@ -450,10 +497,14 @@ class ScrollController {
     }
 
     handleTouchStart(e) {
+        // Solo aplicar en desktop/tablet grande
+        if (window.innerWidth < 769) return;
         this.touchStartY = e.touches[0].clientY;
     }
 
     handleTouchMove(e) {
+        // Solo aplicar en desktop/tablet grande
+        if (window.innerWidth < 769) return;
         if (this.isAnimating) return;
 
         e.preventDefault();
@@ -468,6 +519,8 @@ class ScrollController {
     }
 
     handleTouchEnd(e) {
+        // Solo aplicar en desktop/tablet grande
+        if (window.innerWidth < 769) return;
         // Reset touch start position
         this.touchStartY = 0;
     }
@@ -851,6 +904,93 @@ class VisualEffects {
 }
 
 // ==========================================
+// INTERACCIÓN DE GLOW ORBS CON MOUSE
+// ==========================================
+class GlowOrbInteraction {
+    constructor() {
+        this.orbs = document.querySelectorAll('.glow-orb');
+        this.mouse = { x: 0, y: 0 };
+        this.orbPositions = [];
+        this.init();
+    }
+
+    init() {
+        // Guardar posiciones iniciales
+        this.orbs.forEach(orb => {
+            const rect = orb.getBoundingClientRect();
+            this.orbPositions.push({
+                element: orb,
+                initialX: 0,
+                initialY: 0,
+                currentX: 0,
+                currentY: 0,
+                velocityX: 0,
+                velocityY: 0
+            });
+        });
+
+        // Escuchar movimiento del mouse
+        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        
+        // Iniciar animación
+        this.animate();
+    }
+
+    handleMouseMove(e) {
+        this.mouse.x = e.clientX;
+        this.mouse.y = e.clientY;
+    }
+
+    animate() {
+        this.orbPositions.forEach((orbData, index) => {
+            const orb = orbData.element;
+            const rect = orb.getBoundingClientRect();
+            const orbCenterX = rect.left + rect.width / 2;
+            const orbCenterY = rect.top + rect.height / 2;
+
+            // Calcular distancia al mouse
+            const dx = this.mouse.x - orbCenterX;
+            const dy = this.mouse.y - orbCenterY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Radio de influencia (cuándo empieza a reaccionar)
+            const influenceRadius = 400;
+
+            if (distance < influenceRadius && distance > 0) {
+                // Calcular fuerza de repulsión (más fuerte cuando está más cerca)
+                const force = (influenceRadius - distance) / influenceRadius;
+                
+                // Dirección opuesta al mouse (huir)
+                const angle = Math.atan2(dy, dx);
+                const repelX = -Math.cos(angle) * force * 50;
+                const repelY = -Math.sin(angle) * force * 50;
+
+                // Aplicar velocidad con easing suave
+                orbData.velocityX += (repelX - orbData.currentX) * 0.05;
+                orbData.velocityY += (repelY - orbData.currentY) * 0.05;
+            } else {
+                // Volver a la posición original suavemente
+                orbData.velocityX += (0 - orbData.currentX) * 0.02;
+                orbData.velocityY += (0 - orbData.currentY) * 0.02;
+            }
+
+            // Aplicar fricción
+            orbData.velocityX *= 0.92;
+            orbData.velocityY *= 0.92;
+
+            // Actualizar posición
+            orbData.currentX += orbData.velocityX;
+            orbData.currentY += orbData.velocityY;
+
+            // Aplicar transformación
+            orb.style.transform = `translate(${orbData.currentX}px, ${orbData.currentY}px)`;
+        });
+
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// ==========================================
 // INICIALIZACIÓN
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -865,6 +1005,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializar efectos visuales
     const visualEffects = new VisualEffects();
+
+    // ✨ NUEVO: Inicializar interacción de glow orbs
+    const glowOrbInteraction = new GlowOrbInteraction();
 
     console.log('✨ Portfolio Fernanda Maldonado cargado');
 });

@@ -1259,3 +1259,46 @@ body {
         opacity: 1;
     }
 }
+
+/* ==========================================
+   SCROLLBAR PERSONALIZADO - MÓVIL/DESKTOP
+   ========================================== */
+
+/* Scrollbar visible solo en móviles */
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+        overflow-y: auto !important;
+        scroll-behavior: smooth;
+    }
+    
+    /* Scrollbar personalizada para móviles */
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    body::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
+    
+    body::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Ocultar scrollbar en desktop */
+@media (min-width: 769px) {
+    body::-webkit-scrollbar {
+        display: none;
+    }
+    
+    body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
