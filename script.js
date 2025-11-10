@@ -284,8 +284,8 @@ initCustomScrollbar() {
     // Actualizar posición del thumb basado en scroll
     const updateThumb = () => {
         const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-        const trackHeight = 200; // ERA 140 - actualizar aquí también
-        const thumbHeight = Math.max(40, trackHeight * 0.25); // Mínimo 40px - era 30px
+        const trackHeight = 200;
+        const thumbHeight = Math.max(40, trackHeight * 0.25);
         const maxThumbTop = trackHeight - thumbHeight;
 
         thumb.style.height = `${thumbHeight}px`;
@@ -305,7 +305,7 @@ initCustomScrollbar() {
         e.preventDefault();
     };
 
-    // Mover durante arrastre
+    // Mover durante arrastre - CON CONTROL DE ANIMACIONES
     const onDrag = (e) => {
         if (!isDragging) return;
 
@@ -313,17 +313,71 @@ initCustomScrollbar() {
         const touch = e.touches ? e.touches[0] : e;
         const deltaY = touch.clientY - startY;
 
-        const trackHeight = 200; // Actualizar a nueva altura
+        const trackHeight = 200;
         const thumbHeight = parseFloat(thumb.style.height) || 40;
         const maxThumbTop = trackHeight - thumbHeight;
 
-        // Calcular nuevo scroll basado en movimiento
-        const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        // Calcular dirección del scroll (positivo = abajo, negativo = arriba)
+        const scrollDirection = deltaY > 0 ? 1 : -1;
 
-        // REDUCIR SENSIBILIDAD multiplicando por un factor menor
-        const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight * 0.6; // Factor 0.6 para hacerlo más suave
+        // Obtener la sección actual
+        const currentSectionElement = this.sections[this.currentSection];
+        const sectionId = currentSectionElement ? currentSectionElement.id : null;
 
-        window.scrollTo(0, startScrollY + scrollDelta);
+        // Si estamos en una sección con animaciones, manejar el scroll progresivo
+        if (sectionId === 'blueprint' || sectionId === 'proyectos' ||
+            sectionId === 'filosofia' || sectionId === 'contacto') {
+
+            // Actualizar el progreso de animación basado en el movimiento
+            const progressDelta = (Math.abs(deltaY) / maxThumbTop) * scrollDirection * 0.015;
+            this.animationProgress += progressDelta;
+            this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
+
+            // Actualizar las animaciones de la sección actual
+            if (sectionId === 'blueprint') {
+                this.updateBlueprint(this.animationProgress);
+            } else if (sectionId === 'proyectos') {
+                this.updateProjects(this.animationProgress);
+            } else if (sectionId === 'filosofia') {
+                this.updatePhilosophy(this.animationProgress);
+            } else if (sectionId === 'contacto') {
+                this.updateContact(this.animationProgress);
+            }
+
+            // Si la animación se completó, permitir avanzar a la siguiente sección
+            if (this.animationProgress >= 0.99 && scrollDirection > 0) {
+                if (this.currentSection < this.sections.length - 1) {
+                    this.scrollToNextSection();
+                    isDragging = false; // Detener drag durante transición
+                    thumb.style.cursor = 'grab';
+                    document.body.style.userSelect = '';
+                }
+            }
+
+            // Si volvemos atrás, ir a la sección anterior
+            if (this.animationProgress <= 0.01 && scrollDirection < 0) {
+                if (this.currentSection > 0) {
+                    this.scrollToPrevSection();
+                    isDragging = false;
+                    thumb.style.cursor = 'grab';
+                    document.body.style.userSelect = '';
+                }
+            }
+
+            // Actualizar visualmente el thumb (sin hacer scroll real)
+            const visualProgress = this.animationProgress;
+            const visualTop = visualProgress * maxThumbTop;
+            thumb.style.top = `${visualTop}px`;
+
+        } else {
+            // Para secciones sin animaciones (como inicio), usar scroll normal
+            const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight * 0.6;
+            window.scrollTo(0, startScrollY + scrollDelta);
+        }
+
+        // Actualizar startY para movimiento continuo
+        startY = touch.clientY;
     };
 
     // Terminar arrastre
