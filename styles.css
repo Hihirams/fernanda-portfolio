@@ -1314,7 +1314,6 @@ body {
         margin-bottom: 1rem;
     }
 
-    /* Ajustar Blueprint para mobile - Planta al lado del título */
     .blueprint-section {
         padding: 3rem 0;
         min-height: 100vh;
@@ -1322,31 +1321,49 @@ body {
 
     .blueprint-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
-        display: flex;
-        flex-direction: column;
+        gap: 0;
+        display: grid;
+        grid-template-areas:
+            "title"
+            "content";
     }
 
     .blueprint-text {
-        order: 1;
+        grid-area: content;
+        display: grid;
+        grid-template-columns: 1fr 140px; /* Texto | Planta pequeña */
+        gap: 1rem;
+        align-items: start;
     }
 
-    .blueprint-canvas {
-        order: 2;
-        height: 300px;
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-
-    /* Layout lado a lado para título y planta */
     .section-title {
         font-size: 2rem;
         margin-bottom: 1rem;
+        grid-column: 1;
+    }
+
+    .blueprint-canvas {
+        grid-column: 2;
+        grid-row: 1 / 3; /* Ocupa título + descripción */
+        height: 180px;
+        width: 140px;
+        margin: 0;
+        align-self: start;
+    }
+
+    .section-description {
+        grid-column: 1;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
     }
 
     .stats-container {
+        grid-column: 1 / 3; /* Ocupa ambas columnas */
         margin-top: 1.5rem;
+    }
+
+    .blueprint-status {
+        grid-column: 1 / 3;
     }
 
     .stat-item {
@@ -1354,27 +1371,31 @@ body {
     }
 
     .stat-value {
-        font-size: 2rem;
-        min-width: 70px;
+        font-size: 1.8rem;
+        min-width: 60px;
     }
 
-    /* Subir imágenes de proyectos en mobile */
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
     .projects-section {
         padding: 3rem 0;
     }
 
     .projects-section .section-container {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 
     .projects-grid {
-        height: 75vh;
-        margin-top: 2rem;
+        height: 65vh; /* Reducir altura total */
+        margin-top: 1rem;
     }
 
     .project-card {
-        top: 45%; /* Subir las tarjetas */
+        top: 35%; /* Subir mucho más - era 45% */
+        transform: translateY(-50%); /* Centrar desde ese punto */
     }
 
     .project-content {
@@ -1555,10 +1576,10 @@ body {
         background: rgba(255, 255, 255, 0.5);
     }
 
-    /* Indicador de scroll fijo */
+    /* Hacer el custom scroll indicator interactivo */
     .custom-scroll-indicator {
         position: fixed;
-        right: 12px;
+        right: 8px;
         top: 50%;
         transform: translateY(-50%);
         z-index: 9998;
@@ -1566,32 +1587,44 @@ body {
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
-        opacity: 0.6;
-        pointer-events: none;
+        opacity: 0.8;
+        pointer-events: auto; /* IMPORTANTE: Permitir interacción */
     }
 
     .custom-scroll-indicator span {
         writing-mode: vertical-rl;
-        font-size: 0.65rem;
-        letter-spacing: 0.2em;
+        font-size: 0.6rem;
+        letter-spacing: 0.15em;
         color: var(--accent-dimmer);
         text-transform: uppercase;
+        pointer-events: none;
     }
 
     .custom-scroll-track {
-        width: 2px;
-        height: 120px;
-        background: rgba(255, 255, 255, 0.1);
+        width: 3px;
+        height: 140px;
+        background: rgba(255, 255, 255, 0.15);
         position: relative;
-        border-radius: 2px;
+        border-radius: 3px;
+        cursor: pointer;
     }
 
     .custom-scroll-thumb {
-        width: 2px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 2px;
+        width: 3px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 3px;
         position: absolute;
         top: 0;
-        transition: height 0.3s ease;
+        transition: background 0.2s ease;
+        cursor: grab;
+    }
+
+    .custom-scroll-thumb:active {
+        cursor: grabbing;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .custom-scroll-track:hover .custom-scroll-thumb {
+        background: rgba(255, 255, 255, 0.85);
     }
 }

@@ -274,17 +274,90 @@ class ScrollController {
 
 initCustomScrollbar() {
     const thumb = document.querySelector('.custom-scroll-thumb');
-    if (!thumb) return;
+    const track = document.querySelector('.custom-scroll-track');
+    if (!thumb || !track) return;
 
+    let isDragging = false;
+    let startY = 0;
+    let startScrollY = 0;
+
+    // Actualizar posición del thumb basado en scroll
     const updateThumb = () => {
         const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-        const trackHeight = 120; // Altura del track
-        const thumbHeight = Math.max(20, trackHeight * 0.3); // Mínimo 20px
+        const trackHeight = 140; // Altura del track
+        const thumbHeight = Math.max(30, trackHeight * 0.25); // Mínimo 30px
         const maxThumbTop = trackHeight - thumbHeight;
 
         thumb.style.height = `${thumbHeight}px`;
         thumb.style.top = `${scrollPercentage * maxThumbTop}px`;
     };
+
+    // Iniciar arrastre
+    const startDrag = (e) => {
+        isDragging = true;
+        const touch = e.touches ? e.touches[0] : e;
+        startY = touch.clientY;
+        startScrollY = window.scrollY;
+
+        thumb.style.cursor = 'grabbing';
+        document.body.style.userSelect = 'none';
+
+        e.preventDefault();
+    };
+
+    // Mover durante arrastre
+    const onDrag = (e) => {
+        if (!isDragging) return;
+
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        const deltaY = touch.clientY - startY;
+
+        const trackHeight = 140;
+        const thumbHeight = parseFloat(thumb.style.height) || 30;
+        const maxThumbTop = trackHeight - thumbHeight;
+
+        // Calcular nuevo scroll basado en movimiento
+        const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight;
+
+        window.scrollTo(0, startScrollY + scrollDelta);
+    };
+
+    // Terminar arrastre
+    const endDrag = () => {
+        isDragging = false;
+        thumb.style.cursor = 'grab';
+        document.body.style.userSelect = '';
+    };
+
+    // Click directo en el track (saltar a esa posición)
+    const clickTrack = (e) => {
+        if (e.target === track) {
+            const rect = track.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const trackHeight = 140;
+            const percentage = clickY / trackHeight;
+
+            const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+            window.scrollTo({
+                top: percentage * scrollableHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    // Event listeners
+    thumb.addEventListener('mousedown', startDrag);
+    thumb.addEventListener('touchstart', startDrag, { passive: false });
+
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('touchmove', onDrag, { passive: false });
+
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+
+    track.addEventListener('click', clickTrack);
 
     window.addEventListener('scroll', updateThumb, { passive: true });
     updateThumb();
@@ -519,31 +592,41 @@ initCustomScrollbar() {
     }
 
     handleTouchStart(e) {
-        // Solo aplicar en desktop/tablet grande
-        if (window.innerWidth < 769) return;
+        // DESHABILITAR touch scroll en mobile
+        if (window.innerWidth < 769) {
+            // No hacer nada - el touch no debe funcionar para scroll
+            return;
+        }
+        // Desktop/tablet: mantener funcionalidad original
         this.touchStartY = e.touches[0].clientY;
     }
 
     handleTouchMove(e) {
-        // Solo aplicar en desktop/tablet grande
-        if (window.innerWidth < 769) return;
+        // DESHABILITAR touch scroll en mobile
+        if (window.innerWidth < 769) {
+            // Prevenir el scroll nativo pero no simular wheel
+            e.preventDefault();
+            return;
+        }
+        // Desktop/tablet: mantener funcionalidad original
         if (this.isAnimating) return;
 
         e.preventDefault();
         const touchCurrentY = e.touches[0].clientY;
         const deltaY = this.touchStartY - touchCurrentY;
 
-        // Simular el evento wheel con deltaY
-        const simulatedEvent = { deltaY: deltaY * 2 }; // Multiplicar para mayor sensibilidad
+        const simulatedEvent = { deltaY: deltaY * 2 };
         this.handleWheel(simulatedEvent);
 
         this.touchStartY = touchCurrentY;
     }
 
     handleTouchEnd(e) {
-        // Solo aplicar en desktop/tablet grande
-        if (window.innerWidth < 769) return;
-        // Reset touch start position
+        // DESHABILITAR touch scroll en mobile
+        if (window.innerWidth < 769) {
+            return;
+        }
+        // Desktop/tablet: mantener funcionalidad original
         this.touchStartY = 0;
     }
     
