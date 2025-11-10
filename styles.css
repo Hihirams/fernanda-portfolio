@@ -1600,7 +1600,7 @@ body {
     /* Hacer el custom scroll indicator interactivo */
     .custom-scroll-indicator {
         position: fixed;
-        right: 6px; /* Más cerca del borde */
+        right: 8px;
         top: 50%;
         transform: translateY(-50%);
         z-index: 9998;
@@ -1608,7 +1608,7 @@ body {
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
-        opacity: 0.9;
+        opacity: 0.95;
         pointer-events: auto;
     }
 
@@ -1622,31 +1622,47 @@ body {
     }
 
     .custom-scroll-track {
-        width: 8px; /* MÁS ANCHO - era 3px */
-        height: 200px; /* MÁS ALTO - era 140px */
-        background: rgba(255, 255, 255, 0.2);
+        width: 24px; /* MUCHO MÁS ANCHO para touch */
+        height: 240px; /* MÁS ALTO */
+        background: rgba(255, 255, 255, 0.15);
         position: relative;
-        border-radius: 4px;
+        border-radius: 12px;
         cursor: pointer;
+        padding: 4px; /* Padding para el thumb */
     }
 
     .custom-scroll-thumb {
-        width: 8px; /* MÁS ANCHO - era 3px */
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 4px;
+        width: 16px; /* Thumb visible más angosto */
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 8px;
         position: absolute;
-        top: 0;
-        transition: background 0.2s ease;
+        top: 4px;
+        left: 4px;
+        transition: background 0.15s ease, transform 0.15s ease;
         cursor: grab;
-        min-height: 40px; /* Altura mínima más grande */
+        min-height: 50px; /* Altura mínima generosa */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
-    .custom-scroll-thumb:active {
+    /* Área táctil invisible expandida */
+    .thumb-touch-area {
+        position: absolute;
+        inset: -12px; /* Expande 12px en todas direcciones */
+        border-radius: 20px;
+        background: transparent;
+        cursor: grab;
+    }
+
+    .custom-scroll-thumb:active,
+    .custom-scroll-thumb.dragging {
         cursor: grabbing;
         background: rgba(255, 255, 255, 1);
+        transform: scale(1.15);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
     }
 
-    .custom-scroll-track:hover .custom-scroll-thumb {
-        background: rgba(255, 255, 255, 0.95);
+    .custom-scroll-track:active .custom-scroll-thumb,
+    .custom-scroll-thumb:active .thumb-touch-area {
+        cursor: grabbing;
     }
 }

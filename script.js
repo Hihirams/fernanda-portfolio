@@ -275,125 +275,94 @@ class ScrollController {
 initCustomScrollbar() {
     const thumb = document.querySelector('.custom-scroll-thumb');
     const track = document.querySelector('.custom-scroll-track');
+    const touchArea = document.querySelector('.thumb-touch-area');
+    
     if (!thumb || !track) return;
 
     let isDragging = false;
     let startY = 0;
-    let startScrollY = 0;
+    let startThumbTop = 0;
+
+    const trackHeight = 240; // Altura del track
+    const trackPadding = 4; // Padding del track
+    const usableTrackHeight = trackHeight - (trackPadding * 2);
+
+    // Calcular altura del thumb basado en proporción de contenido
+    const calculateThumbHeight = () => {
+        const viewportHeight = window.innerHeight;
+        const contentHeight = document.documentElement.scrollHeight;
+        const thumbRatio = Math.max(0.2, viewportHeight / contentHeight);
+        return Math.max(50, usableTrackHeight * thumbRatio);
+    };
 
     // Actualizar posición del thumb basado en scroll
     const updateThumb = () => {
         const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-        const trackHeight = 200;
-        const thumbHeight = Math.max(40, trackHeight * 0.25);
-        const maxThumbTop = trackHeight - thumbHeight;
+        const thumbHeight = calculateThumbHeight();
+        const maxThumbTop = usableTrackHeight - thumbHeight;
 
         thumb.style.height = `${thumbHeight}px`;
-        thumb.style.top = `${scrollPercentage * maxThumbTop}px`;
+        thumb.style.top = `${trackPadding + (scrollPercentage * maxThumbTop)}px`;
     };
 
-    // Iniciar arrastre
+    // Iniciar arrastre - MEJORADO para touch
     const startDrag = (e) => {
         isDragging = true;
+        thumb.classList.add('dragging');
+        
         const touch = e.touches ? e.touches[0] : e;
         startY = touch.clientY;
-        startScrollY = window.scrollY;
+        startThumbTop = parseFloat(thumb.style.top) || trackPadding;
 
-        thumb.style.cursor = 'grabbing';
         document.body.style.userSelect = 'none';
+        document.body.style.touchAction = 'none'; // CRÍTICO: Prevenir scroll nativo
 
         e.preventDefault();
+        e.stopPropagation();
     };
 
-    // Mover durante arrastre - CON CONTROL DE ANIMACIONES
+    // Mover durante arrastre - OPTIMIZADO
     const onDrag = (e) => {
         if (!isDragging) return;
 
         e.preventDefault();
+        e.stopPropagation();
+
         const touch = e.touches ? e.touches[0] : e;
         const deltaY = touch.clientY - startY;
-
-        const trackHeight = 200;
-        const thumbHeight = parseFloat(thumb.style.height) || 40;
-        const maxThumbTop = trackHeight - thumbHeight;
-
-        // Calcular dirección del scroll (positivo = abajo, negativo = arriba)
-        const scrollDirection = deltaY > 0 ? 1 : -1;
-
-        // Obtener la sección actual
-        const currentSectionElement = this.sections[this.currentSection];
-        const sectionId = currentSectionElement ? currentSectionElement.id : null;
-
-        // Si estamos en una sección con animaciones, manejar el scroll progresivo
-        if (sectionId === 'blueprint' || sectionId === 'proyectos' ||
-            sectionId === 'filosofia' || sectionId === 'contacto') {
-
-            // Actualizar el progreso de animación basado en el movimiento
-            const progressDelta = (Math.abs(deltaY) / maxThumbTop) * scrollDirection * 0.015;
-            this.animationProgress += progressDelta;
-            this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
-
-            // Actualizar las animaciones de la sección actual
-            if (sectionId === 'blueprint') {
-                this.updateBlueprint(this.animationProgress);
-            } else if (sectionId === 'proyectos') {
-                this.updateProjects(this.animationProgress);
-            } else if (sectionId === 'filosofia') {
-                this.updatePhilosophy(this.animationProgress);
-            } else if (sectionId === 'contacto') {
-                this.updateContact(this.animationProgress);
-            }
-
-            // Si la animación se completó, permitir avanzar a la siguiente sección
-            if (this.animationProgress >= 0.99 && scrollDirection > 0) {
-                if (this.currentSection < this.sections.length - 1) {
-                    this.scrollToNextSection();
-                    isDragging = false; // Detener drag durante transición
-                    thumb.style.cursor = 'grab';
-                    document.body.style.userSelect = '';
-                }
-            }
-
-            // Si volvemos atrás, ir a la sección anterior
-            if (this.animationProgress <= 0.01 && scrollDirection < 0) {
-                if (this.currentSection > 0) {
-                    this.scrollToPrevSection();
-                    isDragging = false;
-                    thumb.style.cursor = 'grab';
-                    document.body.style.userSelect = '';
-                }
-            }
-
-            // Actualizar visualmente el thumb (sin hacer scroll real)
-            const visualProgress = this.animationProgress;
-            const visualTop = visualProgress * maxThumbTop;
-            thumb.style.top = `${visualTop}px`;
-
-        } else {
-            // Para secciones sin animaciones (como inicio), usar scroll normal
-            const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight * 0.6;
-            window.scrollTo(0, startScrollY + scrollDelta);
-        }
-
-        // Actualizar startY para movimiento continuo
-        startY = touch.clientY;
+        
+        const thumbHeight = parseFloat(thumb.style.height) || 50;
+        const maxThumbTop = usableTrackHeight - thumbHeight;
+        
+        // Nueva posición del thumb
+        let newThumbTop = startThumbTop + deltaY;
+        newThumbTop = Math.max(trackPadding, Math.min(trackPadding + maxThumbTop, newThumbTop));
+        
+        // Calcular scroll correspondiente
+        const thumbProgress = (newThumbTop - trackPadding) / maxThumbTop;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        
+        // Actualizar scroll y thumb simultáneamente
+        window.scrollTo(0, thumbProgress * maxScroll);
+        thumb.style.top = `${newThumbTop}px`;
     };
 
     // Terminar arrastre
     const endDrag = () => {
+        if (!isDragging) return;
+        
         isDragging = false;
-        thumb.style.cursor = 'grab';
+        thumb.classList.remove('dragging');
         document.body.style.userSelect = '';
+        document.body.style.touchAction = '';
     };
 
-    // Click directo en el track (saltar a esa posición)
+    // Click directo en el track
     const clickTrack = (e) => {
-        if (e.target === track) {
+        if (e.target === track || e.target.classList.contains('custom-scroll-track')) {
             const rect = track.getBoundingClientRect();
-            const clickY = e.clientY - rect.top;
-            const trackHeight = 200;
-            const percentage = clickY / trackHeight;
+            const clickY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            const percentage = Math.max(0, Math.min(1, clickY / trackHeight));
 
             const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
             window.scrollTo({
@@ -403,20 +372,34 @@ initCustomScrollbar() {
         }
     };
 
-    // Event listeners
-    thumb.addEventListener('mousedown', startDrag);
+    // Event listeners - MEJORADOS
+    // Usar el área táctil expandida para iniciar drag
+    if (touchArea) {
+        touchArea.addEventListener('touchstart', startDrag, { passive: false });
+    }
     thumb.addEventListener('touchstart', startDrag, { passive: false });
+    thumb.addEventListener('mousedown', startDrag);
 
-    document.addEventListener('mousemove', onDrag);
+    // Listeners globales para drag
     document.addEventListener('touchmove', onDrag, { passive: false });
+    document.addEventListener('mousemove', onDrag);
 
-    document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchcancel', endDrag);
+    document.addEventListener('mouseup', endDrag);
 
+    // Click en track
+    track.addEventListener('touchstart', clickTrack, { passive: false });
     track.addEventListener('click', clickTrack);
 
+    // Actualizar en scroll
     window.addEventListener('scroll', updateThumb, { passive: true });
+    
+    // Inicializar
     updateThumb();
+    
+    // Actualizar en resize
+    window.addEventListener('resize', updateThumb, { passive: true });
 }
 
     
