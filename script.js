@@ -284,8 +284,8 @@ initCustomScrollbar() {
     // Actualizar posición del thumb basado en scroll
     const updateThumb = () => {
         const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-        const trackHeight = 140; // Altura del track
-        const thumbHeight = Math.max(30, trackHeight * 0.25); // Mínimo 30px
+        const trackHeight = 200; // ERA 140 - actualizar aquí también
+        const thumbHeight = Math.max(40, trackHeight * 0.25); // Mínimo 40px - era 30px
         const maxThumbTop = trackHeight - thumbHeight;
 
         thumb.style.height = `${thumbHeight}px`;
@@ -313,13 +313,15 @@ initCustomScrollbar() {
         const touch = e.touches ? e.touches[0] : e;
         const deltaY = touch.clientY - startY;
 
-        const trackHeight = 140;
-        const thumbHeight = parseFloat(thumb.style.height) || 30;
+        const trackHeight = 200; // Actualizar a nueva altura
+        const thumbHeight = parseFloat(thumb.style.height) || 40;
         const maxThumbTop = trackHeight - thumbHeight;
 
         // Calcular nuevo scroll basado en movimiento
         const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight;
+
+        // REDUCIR SENSIBILIDAD multiplicando por un factor menor
+        const scrollDelta = (deltaY / maxThumbTop) * scrollableHeight * 0.6; // Factor 0.6 para hacerlo más suave
 
         window.scrollTo(0, startScrollY + scrollDelta);
     };
@@ -336,7 +338,7 @@ initCustomScrollbar() {
         if (e.target === track) {
             const rect = track.getBoundingClientRect();
             const clickY = e.clientY - rect.top;
-            const trackHeight = 140;
+            const trackHeight = 200;
             const percentage = clickY / trackHeight;
 
             const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
