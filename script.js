@@ -727,11 +727,11 @@ handleTouchStart(e) {
             if (sectionId === 'blueprint' || sectionId === 'proyectos' ||
                 sectionId === 'filosofia' || sectionId === 'contacto') {
 
-                let scrollSpeed = 0.008; // Más rápido para touch directo
-                if (sectionId === 'blueprint') scrollSpeed = 0.01;
-                if (sectionId === 'proyectos') scrollSpeed = 0.009;
-                if (sectionId === 'filosofia') scrollSpeed = 0.012;
-                if (sectionId === 'contacto') scrollSpeed = 0.012;
+                let scrollSpeed = 0.003; // MÁS LENTO - era 0.008
+                if (sectionId === 'blueprint') scrollSpeed = 0.004; // MÁS LENTO - era 0.01
+                if (sectionId === 'proyectos') scrollSpeed = 0.0035; // MÁS LENTO - era 0.009
+                if (sectionId === 'filosofia') scrollSpeed = 0.005; // MÁS LENTO - era 0.012
+                if (sectionId === 'contacto') scrollSpeed = 0.005; // MÁS LENTO - era 0.012
 
                 this.animationProgress += deltaY * scrollSpeed;
                 this.animationProgress = Math.max(0, Math.min(1, this.animationProgress));
@@ -764,7 +764,7 @@ handleTouchStart(e) {
                 if (!this.touchAccumulator) this.touchAccumulator = 0;
                 this.touchAccumulator += deltaY;
 
-                if (Math.abs(this.touchAccumulator) > 100) {
+                if (Math.abs(this.touchAccumulator) > 150) {
                     if (this.touchAccumulator > 0 && this.currentSection < this.sections.length - 1) {
                         this.scrollToNextSection();
                     }
